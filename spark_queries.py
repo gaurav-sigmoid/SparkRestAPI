@@ -55,15 +55,15 @@ class Queries:
 
     def stock_with_max_movement(self):
         try:
-            query_4 = "Select stocks.company, stocks.open, stocks.high, (stocks.high - stocks.open) " \
-                      "as max_diff from (Select company, (Select open from stocks limit 1) as open, max(high) as high " \
+            query_4 = "Select stocks.company, stocks.open, stocks.close, ABS(stocks.close - stocks.open) " \
+                      "as max_diff from (Select company, (Select open from stocks limit 1) as open, (select close from stocks order by Date DESC limit 1) as close " \
                       "from stocks group by company)stocks order by max_diff desc limit 1"
             data = spark.sql(query_4).collect()
             results = {}
             for row in data:
                 results['company'] = row['company']
                 results['open'] = row['open']
-                results['high'] = row['high']
+                results['close'] = row['close']
                 results['max_diff'] = row['max_diff']
             return results
         except Exception as e:
